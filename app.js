@@ -4,9 +4,10 @@ const connectDatabase = require("./connection")
 const path = require("path")
 const fileRouter = require("./routes/files")
 
+console.log("MONGO_URL received:", process.env.MONGO_URL ? "YES" : "NOT SET")
 connectDatabase(process.env.MONGO_URL)
     .then(() => console.log("Database Connected!"))
-    .catch(() => console.log("Error in Database Connection!"))
+    .catch((err) => console.log("Error in Database Connection!", err.message))
 
 const app = express()
 const PORT = process.env.PORT || 8000
