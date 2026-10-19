@@ -2,7 +2,7 @@ const fs = require("fs")
 
 function createLogs(pathname){
     return (req, res, next) => {
-        const data = `new request recieved at ${req.path} by method ${req.method}`
+        const data = `new request recieved at ${req.path} by method ${req.method}\n`
 
         fs.appendFile(pathname, data, (err) => {
             if(err){

@@ -4,6 +4,12 @@ const connectDatabase = require("./connection")
 const path = require("path")
 const fileRouter = require("./routes/files")
 const createLogs = require("./middlewares/logs")
+const startCleanup = require("./cleanup")
+const fs = require("fs")
+
+// make sure uploads folder exists and remove expired files from it
+fs.mkdirSync(path.resolve("./uploads"), { recursive: true })
+startCleanup(path.resolve("./uploads"))
 
 connectDatabase(process.env.MONGO_URL)
     .then(() => console.log("Database Connected!"))
@@ -20,9 +26,9 @@ app.set("views", path.resolve("./views"))
 
 app.use("/", fileRouter)
 
-app.listen(PORT, () => console.log(`server is listening at port ${PORT}`))
-
 // incase of invalid path
 app.use((req, res) => {
-    return res.end("Page not found!")
+    return res.status(404).end("Page not found!")
 })
+
+app.listen(PORT, () => console.log(`server is listening at port ${PORT}`))

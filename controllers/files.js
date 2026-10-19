@@ -1,4 +1,5 @@
 const fileModel = require("../models/files")
+const { EXPIRY_MINUTES } = require("../models/files")
 const path = require("path")
 const fs = require("fs")
 
@@ -57,8 +58,9 @@ async function handleFileSearchAndDownload(req, res) {
 
         const requiredFile = await fileModel.findById(trimId)
        
-        // incase no file found
-        if (!requiredFile) {
+        // incase no file found or file is expired (mongodb ttl can take up to a minute to remove it)
+        const expiryTime = EXPIRY_MINUTES * 60 * 1000
+        if (!requiredFile || Date.now() - requiredFile.createdAt.getTime() > expiryTime) {
             return res.status(404).render("download", {
                 message: "no file found with this id"
             })
@@ -84,7 +86,7 @@ async function handleFileSearchAndDownload(req, res) {
         }
     }
     catch(err){
-        return res.status(400).render("Download", {
+        return res.status(400).render("download", {
             message : "No File exists with this ID!"
         })
     }
